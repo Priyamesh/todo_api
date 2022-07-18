@@ -13,8 +13,8 @@ from .models import Task
 @api_view(["GET"])
 def api_overview(request):
     api_urls = {
-        "list": "/task-list",
-        "task-detail": "/task-list/<int:pk>",
+        "/task-list": "list",
+        "/task-list/<int:pk>": "task-detail",
         "/task-create": "task create",
         "/task-update/<int:pk>": "task update",
         "/task-delete/<int:pk>": "task delete",
@@ -24,7 +24,7 @@ def api_overview(request):
 
 @api_view(["GET"])
 def taskList(request):
-    tasks = Task.objects.all()
+    tasks = Task.objects.all().order_by("-id")
     serializer = TaskSerializers(tasks, many=True)
     return Response(serializer.data)
 
@@ -38,6 +38,7 @@ def taskDetail(request, pk):
 
 @api_view(["POST"])
 def taskCreate(request):
+    # print(request.POST, "hello")
     serializer = TaskSerializers(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -55,7 +56,7 @@ def taskUpdate(request, pk):
     return Response(serializer.data)
 
 
-@api_view(["DELETE"])
+@api_view(["GET"])
 def taskDelete(request, pk):
     task = Task.objects.get(id=pk)
     task.delete()
